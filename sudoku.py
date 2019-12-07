@@ -1,5 +1,7 @@
 import tkinter as tk
 
+import time
+
 
 class MainWindow(tk.Tk):
 
@@ -30,14 +32,13 @@ class MainWindow(tk.Tk):
         frame = self.frames[cont]
         frame.configure(bg = "#2c3c43")
         frame.tkraise()
-
         
 class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
 
-        tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#39742c",font=("Times New Roman", 20, "bold")).place(x = 370, y=50)
+        tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).place(x = 370, y=50)
 
         Continue = tk.Button(self, text="Continue",highlightthickness = 0, width = 50, height = 3,
                             command=lambda: controller.show_frame(GameScreen))
@@ -70,12 +71,20 @@ class GameScreen(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
     
-        tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#39742c", font=("Times New Roman", 20, "bold")).place(x = 300, y=50)
+        tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).place(x = 200, y=50)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
                             command=lambda: controller.show_frame(MainMenu))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.place(x=50,y=50)
+
+        jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0, width = 10, height = 1,
+                            command=lambda: controller.show_frame(SettingsMenu))
+        jumpToSettings.configure(bg = "#a7e02c")
+        jumpToSettings.place(x=650,y=50)
+
+        playMatrix = tk.Frame(self, bg = "#222e34", width = 600, height = 600)
+        playMatrix.place(x = 100, y = 100)
 
        
 
@@ -85,12 +94,18 @@ class SettingsMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#39742c",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
+        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
                             command=lambda: controller.show_frame(MainMenu))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.place(x=50,y=50)
+
+        numbersLeft = tk.Checkbutton(self, text ='Show count of each number left', 
+                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 150) 
+        validateGame = tk.Checkbutton(self, text ='Show button to validate your progress in game', 
+                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 200) 
+
 
 
 class LeaderboardMenu(tk.Frame):
@@ -98,7 +113,7 @@ class LeaderboardMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        tk.Label(self, text = "Leaderboard", bg = "#2c3c43", fg = "#39742c", font=("Times New Roman", 20, "bold")).place(x = 300, y=50)
+        tk.Label(self, text = "Leaderboard", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).place(x = 300, y=50)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
                             command=lambda: controller.show_frame(MainMenu))
@@ -139,9 +154,6 @@ class LeaderboardMenu(tk.Frame):
         	topRecordDate.grid(column = 2, row =pos)
 
         	nth_row+=1
-
-
-
 
 
 app = MainWindow()
