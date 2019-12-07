@@ -38,54 +38,114 @@ class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
 
-        tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).place(x = 370, y=50)
+        #Nastavenia okna Menu 
 
-        Continue = tk.Button(self, text="Continue",highlightthickness = 0, width = 50, height = 3,
+        self.grid_columnconfigure(0, weight = 1)
+
+        self.grid_columnconfigure(1, weight = 3)
+
+        self.grid_columnconfigure(2, weight = 1)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
+
+        self.grid_rowconfigure(0, weight = 15)
+        self.grid_rowconfigure(1, weight = 10)
+        self.grid_rowconfigure(2, weight = 5)
+        self.grid_rowconfigure(3, weight = 10)
+        self.grid_rowconfigure(4, weight = 5)
+        self.grid_rowconfigure(5, weight = 10)
+        self.grid_rowconfigure(6, weight = 5)
+        self.grid_rowconfigure(7, weight = 10)
+        self.grid_rowconfigure(8, weight = 15)
+
+        #Koniec nastaveni okna Menu
+
+
+        tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).grid(row = 0, column = 1)
+
+        Continue = tk.Button(self, text="Continue",highlightthickness = 0, width = 75, height = 3,
                             command=lambda: controller.show_frame(GameScreen))
         Continue.configure(bg = "#a7e02c")
-        Continue.place(x=200,y=100)
+        #Continue.place(x=200,y=100)
+        Continue.grid(row = 1, column = 1)
 
 
 
-        newGame = tk.Button(self, text="New Game",highlightthickness = 0, width = 50, height = 3,
+        newGame = tk.Button(self, text="New Game",highlightthickness = 0, width = 75, height = 3,
                             command=lambda: controller.show_frame(GameScreen))
         newGame.configure(bg = "#a7e02c")
-        newGame.place(x=200,y=200)
+        #newGame.place(x=200,y=200)
+        newGame.grid(row = 3, column = 1)
 
 
-
-        Settings = tk.Button(self, text="Settings",highlightthickness = 0, width = 50, height = 3,
+        Settings = tk.Button(self, text="Settings",highlightthickness = 0, width = 75, height = 3,
                             command=lambda: controller.show_frame(SettingsMenu))
         Settings.configure(bg = "#a7e02c")
-        Settings.place(x=200,y=300)
-
+        #Settings.place(x=200,y=300)
+        Settings.grid(row = 5, column = 1)
 
         
-        Leaderboard = tk.Button(self, text="Leaderboard",highlightthickness = 0, width = 50, height = 3,
+        Leaderboard = tk.Button(self, text="Leaderboard",highlightthickness = 0, width = 75, height = 3,
                             command=lambda: controller.show_frame(LeaderboardMenu))
         Leaderboard.configure(bg = "#a7e02c")
-        Leaderboard.place(x=200,y=400)
+        #Leaderboard.place(x=200,y=400)
+        Leaderboard.grid(row = 7, column = 1)
 
 class GameScreen(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-    
-        tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).place(x = 200, y=50)
 
-        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
+
+        #Nastavenia okna Leaderboard
+        self.grid_columnconfigure(0, weight = 10)
+
+        self.grid_columnconfigure(1, weight = 80)
+
+        self.grid_columnconfigure(2, weight = 10)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
+
+        self.grid_rowconfigure(0, weight = 5)
+        self.grid_rowconfigure(1, weight = 15)
+        self.grid_rowconfigure(2, weight = 70)
+        self.grid_rowconfigure(3, weight = 5)
+        #Koniec nastaveni okna Leaderboard
+
+
+    
+        tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).grid(row = 1, column = 1)
+
+        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,
                             command=lambda: controller.show_frame(MainMenu))
         backToMenu.configure(bg = "#a7e02c")
-        backToMenu.place(x=50,y=50)
+        backToMenu.grid(row = 1, column = 0)
 
-        jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0, width = 10, height = 1,
+        jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,
                             command=lambda: controller.show_frame(SettingsMenu))
         jumpToSettings.configure(bg = "#a7e02c")
-        jumpToSettings.place(x=650,y=50)
+        jumpToSettings.grid(row = 1, column = 2)
 
-        playMatrix = tk.Frame(self, bg = "#222e34", width = 600, height = 600)
-        playMatrix.place(x = 100, y = 100)
 
+
+
+        playMatrix = tk.Frame(self, bg = "#222e34",   height = 600)
+        playMatrix.grid(column = 1, row = 2)
+
+        # Herny grid
+       	for x in range(0,9):
+       		playMatrix.grid_columnconfigure(x, weight = 1)
+       		playMatrix.grid_rowconfigure(x, weight = 1)
+
+       	for rows in range(0,9):
+       		for columns in range(0,9):
+       			tk.Label(playMatrix,text = "0", width = 10, height = 3).grid(row = rows, column = columns)
+       			pass
+       		pass
        
 
         
@@ -113,16 +173,44 @@ class LeaderboardMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        tk.Label(self, text = "Leaderboard", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).place(x = 300, y=50)
+
+        #Nastavenia okna Leaderboard
+        self.grid_columnconfigure(0, weight = 1)
+
+        self.grid_columnconfigure(1, weight = 8)
+
+        self.grid_columnconfigure(2, weight = 1)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
+
+        self.grid_rowconfigure(0, weight = 5)
+        self.grid_rowconfigure(1, weight = 15)
+        self.grid_rowconfigure(2, weight = 75)
+        self.grid_rowconfigure(3, weight = 5)
+        #Koniec nastaveni okna Leaderboard
+
+
+        tk.Label(self, text = "Leaderboard", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).grid(row = 1, column = 1)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
                             command=lambda: controller.show_frame(MainMenu))
         backToMenu.configure(bg = "#a7e02c")
-        backToMenu.place(x=50,y=50)
+        backToMenu.grid(row = 1, column = 0)
 
+        #LEADERBOARD
 
-        table = tk.Frame(self,  width = 600, height = 600)
-        table.place(x = 100, y=120)
+        table = tk.Frame(self, width = 100)
+        table.grid(row = 2, column = 1)
+
+        #Nastavenie Leaderboardu
+
+        table.grid_columnconfigure(0,weight = 1)
+        table.grid_columnconfigure(1,weight = 5)
+        table.grid_columnconfigure(2,weight = 4)
+
+        #Koniec nastaveni Leaderboardu
 
         topPosition = tk.Label(table, text = "Position", fg = "#7aa719", width = 15, height = 3, bg = "#222e34")
         topPosition.grid(column = 0, row =0)
@@ -157,7 +245,7 @@ class LeaderboardMenu(tk.Frame):
 
 
 app = MainWindow()
-app.geometry("800x800")
-app.resizable(0,0)
+app.minsize(800,600)
+#app.resizable(0,0)
 app.title("Sudoku")
 app.mainloop()
