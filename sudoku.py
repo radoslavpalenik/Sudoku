@@ -77,6 +77,8 @@ class GameScreen(tk.Frame):
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.place(x=50,y=50)
 
+       
+
         
 class SettingsMenu(tk.Frame):
 
@@ -102,6 +104,42 @@ class LeaderboardMenu(tk.Frame):
                             command=lambda: controller.show_frame(MainMenu))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.place(x=50,y=50)
+
+
+        table = tk.Frame(self,  width = 600, height = 600)
+        table.place(x = 100, y=120)
+
+        topPosition = tk.Label(table, text = "Position", fg = "#7aa719", width = 15, height = 3, bg = "#222e34")
+        topPosition.grid(column = 0, row =0)
+
+        topTime = tk.Label(table, text = "Time", fg = "#7aa719", width = 35, height = 3, bg = "#222e34")
+        topTime.grid(column = 1, row =0)
+
+        topDate = tk.Label(table, text = "Date", fg = "#7aa719", width = 25, height = 3, bg = "#222e34")
+        topDate.grid(column = 2, row =0)
+
+        nth_row = 0
+        bgcol = "#4a6571"
+
+        for pos in range(1,11):
+
+        	if (nth_row % 2) :
+        		bgcol = "#4a6571"
+        	else:
+        		bgcol = "#7aa719"
+
+
+        	topRecordPosition = tk.Label(table, text = pos, width = 15, height = 3, bg = bgcol)
+        	topRecordPosition.grid(column = 0, row =pos)
+
+        	topRecordTime = tk.Label(table, text = "Best Time " + str(pos), width = 35, height = 3, bg = bgcol)
+        	topRecordTime.grid(column = 1, row =pos)
+
+        	topRecordDate = tk.Label(table, text = "Date of time", width = 25, height = 3, bg = bgcol)
+        	topRecordDate.grid(column = 2, row =pos)
+
+        	nth_row+=1
+
 
 
 
