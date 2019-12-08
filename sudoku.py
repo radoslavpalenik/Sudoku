@@ -1,9 +1,12 @@
 import tkinter as tk
-
+import tkinter.ttk
 import time
+import mapGenerator
 
 
 inputVal = 1
+
+
 
 def selectValue(val):
 	global inputVal
@@ -108,6 +111,8 @@ class GameScreen(tk.Frame):
 
 
         for x in range(0,9):
+
+
         	tk.Button(leftBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
         	 highlightthickness = 0, bd = 0, pady = 25, padx = 20,
         	  command = lambda val = x+1: selectValue(val)).grid(column = 0, row = x)
@@ -133,31 +138,46 @@ class GameScreen(tk.Frame):
         playMatrix = tk.Frame(self, bg = "#222e34", height = 600)
         playMatrix.grid(column = 1, row = 2)
 
-        sdkBtn =  [[0 for x in range(9)] for x in range(9)]
+        sdkBtn =  [[0 for x in range(11)] for x in range(11)]
 
+        fullBoard = mapGenerator.make_board(3)
 
         # Herny grid
        	for x in range(0,9):
        		playMatrix.grid_columnconfigure(x, weight = 1)
        		playMatrix.grid_rowconfigure(x, weight = 1)
 
-       	for rows in range(0,9):
-       		for columns in range(0,9):
+       	for rows in range(0,11):
+            for columns in range(0,11):
+                if columns != 3 and columns != 7 and rows != 3 and rows != 7:
+                    act_col = columns
+                    act_row = rows
+                    if columns > 3:
+                        if columns > 7:
+                            act_col = act_col -1
+                        act_col = act_col -1
+                    if rows > 3:
+                        if rows > 7:
+                            act_row = act_row -1
+                        act_row = act_row -1
 
-       			sdkBtn[rows][columns] = tk.Button(playMatrix,bd = 0,
-       			 width = 6, height = 4,
-       			 bg = "#2c3c43", fg = "#7aa719", font = ('Helvetica 15 bold') , highlightthickness = 0,
-       			 command = lambda i=rows, j=columns : putValue(i, j, inputVal) )
-       			
 
-       			sdkBtn[rows][columns].grid(row = rows, column = columns)
-       	
+                    sdkBtn[act_row][act_col] = tk.Button(playMatrix, text = fullBoard[act_row][act_col],width = 6, height = 4,
+                     bg = "#2c3c43", fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal),
+                      highlightthickness = 0, bd = 0,).grid(row = rows, column = columns)
+                else:
+                    if rows == 3 or rows == 7:
+                        tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
+                    else:
+                        tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
 
-
+                    
+       	#tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=1, row=0, rowspan=3, sticky='ns')
        	#controler pre zmenu vlastnosti na danej pozicii v poli
        	def putValue(x, y, val):
-       		sdkBtn[x][y].configure(text = val)
-       		pass
+            print("changing value ["+str(x)+"]["+str(y)+"]")
+            sdkBtn[x][y].configure(text = str(val))
+       		
        	 
 
 
