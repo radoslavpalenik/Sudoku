@@ -239,7 +239,7 @@ class SettingsMenu(tk.Frame):
                            command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(SummaryScreen, False)).grid(row = 0, column = 3)
 
         tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold"), pady = 15).grid( row = 0, column = 1)
 
@@ -294,10 +294,10 @@ class SummaryScreen(tk.Frame):
         
 
         tk.Label(self, text = "You did it!", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 50, "bold", "italic")).place(x = 250, y=250)
-        tk.Label(self, text = "Your final time will be here", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
+        tk.Label(self, text = "Your time: {0}:{1}".format(random.randint(0,3), random.randint(0,59)), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
 
 
-        backToMenu = tk.Button(self, text="{0}:{1}".format(random.randint(0,3), random.randint(0,59)),highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
+        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
 
 

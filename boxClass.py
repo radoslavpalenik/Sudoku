@@ -42,7 +42,7 @@ class Box():
         self.tip.remove(tip)
 
 
-    def isLocked(self)
+    def isLocked(self):
         '''
         Return lock value
         '''
