@@ -1,9 +1,15 @@
 import tkinter as tk
 import tkinter.ttk
-import time
 import random
 import mapGenerator
+import boxClass
+import sudokuClass
 
+#   ITU, 2019, 2BIT
+#   Authors: Radoslav Páleník <xpalen05@stud.fit.vutbr.cz>, Daniel Pohančaník <xpohan03@stud.fit.vutbr.cz>, Michal Řezáč <xrezac20@stud.fit.vutbr.cz>
+
+
+#Hodnota, ktorou sa zadáva vstup z myši do poľa
 inputVal = 1
 
 def selectValue(val):
@@ -77,16 +83,16 @@ class MainMenu(tk.Frame):
 
         tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).grid(row = 0, column = 1)
 
-        Continue = tk.Button(self, text="Continue",highlightthickness = 0, width = 75, height = 3,bg = "#a7e02c",
+        Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
                             command=lambda: controller.show_frame(GameScreen, False)).grid(row = 1, column = 1)
 
-        newGame = tk.Button(self, text="New Game",highlightthickness = 0, width = 75, height = 3,bg = "#a7e02c",
+        newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(GameScreen, False)).grid(row = 3, column = 1)
 
-        Settings = tk.Button(self, text="Settings",highlightthickness = 0, width = 75, height = 3,bg = "#a7e02c",
+        Settings = tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, False)).grid(row = 5, column = 1)
 
-        Leaderboard = tk.Button(self, text="Leaderboard",highlightthickness = 0, width = 75, height = 3,bg = "#a7e02c",
+        Leaderboard = tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(LeaderboardMenu, False)).grid(row = 7, column = 1)
 
 
@@ -105,14 +111,10 @@ class GameScreen(tk.Frame):
 
         leftBar = tk.Frame(self, width = 25)
         leftBar.grid(column = 0, row =2)
-        #tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
-
 
         for x in range(0,9):
-
-
             tk.Button(leftBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
-             highlightthickness = 0, bd = 0, pady = 25, padx = 20,
+             highlightthickness = 0, bd = 0, pady = 20, padx = 20,
               command = lambda val = x+1: selectValue(val)).grid(column = 0, row = x)
             
 
@@ -122,32 +124,36 @@ class GameScreen(tk.Frame):
         self.grid_rowconfigure(3, weight = 5)
         #Koniec nastaveni okna Leaderboard
 
-
+        #Horna Navigacia
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, True)).grid(row = 0, column = 2)
  
-
-        playMatrix = tk.Frame(self, bg = "#222e34", height = 600)
+        #Matica 9x9
+        playMatrix = tk.Frame(self, bg = "#222e34")
         playMatrix.grid(column = 1, row = 2)
 
         sdkBtn =  [[0 for x in range(11)] for x in range(11)]
 
+        #Generovanie Matice 
         fullBoard = mapGenerator.make_board(3)
 
-        # Herny grid
+        # Game grid
         for x in range(0,9):
             playMatrix.grid_columnconfigure(x, weight = 1)
             playMatrix.grid_rowconfigure(x, weight = 1)
 
         for rows in range(0,11):
             for columns in range(0,11):
+
                 if columns != 3 and columns != 7 and rows != 3 and rows != 7:
                     act_col = columns
                     act_row = rows
                     bgcol = "#2c3c43"
+                    
+                    #Potrebne posunutie matice pokial pride vykreslovanie na ciaru
                     if columns > 3:
                         if columns > 7:
                             act_col = act_col -1
@@ -156,6 +162,8 @@ class GameScreen(tk.Frame):
                         if rows > 7:
                             act_row = act_row -1
                         act_row = act_row -1
+
+                    #Prepinanie farieb pre lepsiu prehladnost aplikacie
                     if ((columns <= 2 or columns >= 7) and (rows <= 2 or rows >=7)) or ((columns > 2 and columns < 7 ) and (rows > 3 and rows < 8)) :
                         bgcol = "#4a6571"
 
@@ -170,13 +178,17 @@ class GameScreen(tk.Frame):
                     else:
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
 
+        #Vyplnenie nahodnych cislic, tak aby boli na kazdom riadku vyplnene aspon 2 a celkovo 24 cislic v celej matici
         for x in range(0,9):
             toShowPosition = random.randint(0,8)
             sdkBtn[x][toShowPosition]['text'] = fullBoard[x][toShowPosition]
+            sdkBtn[x][toShowPosition].configure(state = "disabled")
             toShowAnotherPosition = random.randint(0,8)
             while toShowAnotherPosition == toShowPosition:
                 toShowAnotherPosition = random.randint(0,8)
             sdkBtn[x][toShowAnotherPosition]['text'] =  fullBoard[x][toShowAnotherPosition]
+            sdkBtn[x][toShowAnotherPosition].configure(state = "disabled")
+            
 
         numsShown = 18
         while numsShown < 25:
@@ -187,7 +199,8 @@ class GameScreen(tk.Frame):
                 randX = random.randint(0,8)
                 randY = random.randint(0,8)
 
-            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY] 
+            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY]
+            sdkBtn[randX][randY].configure(state = "disabled")
             numsShown += 1
             
 
@@ -216,17 +229,32 @@ class SettingsMenu(tk.Frame):
         tk.Frame.__init__(self, parent)
         
 
-        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
+        #Nastavenia okna Settings
+        self.grid_columnconfigure(0,weight = 1)
+        self.grid_columnconfigure(1,weight = 5)
+        self.grid_columnconfigure(2,weight = 1)
 
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
+                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
+        #Moj Super CHEAT
+        tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
+                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 3)
 
+        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold"), pady = 15).grid( row = 0, column = 1)
 
-        numbersLeft = tk.Checkbutton(self, text ='Show count of each number left', 
-                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 150) 
-        validateGame = tk.Checkbutton(self, text ='Show button to validate your progress in game', 
-                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 200) 
+        tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
+                takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Show button to validate progress of game', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 2, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Highlight column and row on item hover', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 3, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Enable adding notes in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 4, column = 1,pady = 15,  sticky ="we")
+
 
 class backtoGameSettingsMenu(tk.Frame):
 
@@ -234,19 +262,30 @@ class backtoGameSettingsMenu(tk.Frame):
         tk.Frame.__init__(self, parent)
         
 
-        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
- 
-
-        backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(GameScreen, False)).place(x=50,y=50)
+        self.grid_columnconfigure(0,weight = 1)
+        self.grid_columnconfigure(1,weight = 5)
+        self.grid_columnconfigure(2,weight = 1)
 
 
-        numbersLeft = tk.Checkbutton(self, text ='Show count of each number left', 
-                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43",
-                     highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 150) 
-        validateGame = tk.Checkbutton(self, text ='Show button to validate your progress in game', 
-                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43",
-                     highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 200) 
+        backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
+                           command=lambda: controller.show_frame(GameScreen, False)).grid(row = 0, column = 0)
+        #Moj Super CHEAT
+        tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
+                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 3)
+
+        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold"), pady = 15).grid( row = 0, column = 1)
+
+        tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
+                takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Show button to validate progress of game', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 2, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Highlight column and row on item hover', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 3, column = 1,pady = 15,  sticky ="we")
+
+        tk.Checkbutton(self, text ='Enable adding notes in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
+                takefocus = 0, ).grid(row = 4, column = 1,pady = 15,  sticky ="we")
 
 class SummaryScreen(tk.Frame):
 
@@ -258,9 +297,8 @@ class SummaryScreen(tk.Frame):
         tk.Label(self, text = "Your final time will be here", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
 
 
-        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
+        backToMenu = tk.Button(self, text="{0}:{1}".format(random.randint(0,3), random.randint(0,59)),highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
-
 
 
 class LeaderboardMenu(tk.Frame):
@@ -342,8 +380,7 @@ class LeaderboardMenu(tk.Frame):
             nth_row+=1
 
    
-
 app = MainWindow()
-app.minsize(800,700)
+app.minsize(900,700)
 app.title("Sudoku")
 app.mainloop()
