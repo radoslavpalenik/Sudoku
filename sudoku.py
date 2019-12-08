@@ -1,12 +1,10 @@
 import tkinter as tk
 import tkinter.ttk
 import time
+import random
 import mapGenerator
 
-
 inputVal = 1
-
-
 
 def selectValue(val):
     global inputVal
@@ -162,7 +160,7 @@ class GameScreen(tk.Frame):
                         bgcol = "#4a6571"
 
 
-                    sdkBtn[act_row][act_col] = tk.Button(playMatrix, text = fullBoard[act_row][act_col],width = 5, height = 3,
+                    sdkBtn[act_row][act_col] = tk.Button(playMatrix,width = 5, height = 3,
                      bg = bgcol, fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal, controller),
                       highlightthickness = 0, bd = 0,)
                     sdkBtn[act_row][act_col].grid(row = rows, column = columns)
@@ -171,10 +169,30 @@ class GameScreen(tk.Frame):
                         tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
                     else:
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
-       
 
-                    
-        #tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=1, row=0, rowspan=3, sticky='ns')
+        for x in range(0,9):
+            toShowPosition = random.randint(0,8)
+            sdkBtn[x][toShowPosition]['text'] = fullBoard[x][toShowPosition]
+            toShowAnotherPosition = random.randint(0,8)
+            while toShowAnotherPosition == toShowPosition:
+                toShowAnotherPosition = random.randint(0,8)
+            sdkBtn[x][toShowAnotherPosition]['text'] =  fullBoard[x][toShowAnotherPosition]
+
+        numsShown = 18
+        while numsShown < 25:
+            randX = random.randint(0,8)
+            randY = random.randint(0,8)
+
+            while sdkBtn[randX][randY]['text']:
+                randX = random.randint(0,8)
+                randY = random.randint(0,8)
+            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY]  
+            numsShown += 1
+
+        for x in range(0,9):
+            print(str(fullBoard[x][0])+str(fullBoard[x][1])+str(fullBoard[x][2])+str(fullBoard[x][3])+str(fullBoard[x][4])+str(fullBoard[x][5])+str(fullBoard[x][6])+str(fullBoard[x][7])+str(fullBoard[x][8]))
+            
+
         #controler pre zmenu vlastnosti na danej pozicii v poli
         def putValue( x, y, val, cont):
             print("changing value ["+str(x)+"]["+str(y)+"]")
@@ -189,11 +207,6 @@ class GameScreen(tk.Frame):
             print(str(isMatrixCorrect))
             if isMatrixCorrect:
                 cont.show_frame(SummaryScreen, False)
-
-            
-         
-
-
         
 class SettingsMenu(tk.Frame):
 
@@ -315,15 +328,14 @@ class LeaderboardMenu(tk.Frame):
             else:
                 bgcol = "#7aa719"
 
-
             topRecordPosition = tk.Label(table, text = pos, width = 15, height = 3, bg = bgcol)
-            topRecordPosition.grid(column = 0, row =pos)
+            topRecordPosition.grid(column = 0, row = pos)
 
             topRecordTime = tk.Label(table, text = "Best Time " + str(pos), width = 35, height = 3, bg = bgcol)
-            topRecordTime.grid(column = 1, row =pos)
+            topRecordTime.grid(column = 1, row = pos)
 
             topRecordDate = tk.Label(table, text = "Date of time", width = 25, height = 3, bg = bgcol)
-            topRecordDate.grid(column = 2, row =pos)
+            topRecordDate.grid(column = 2, row = pos)
 
             nth_row+=1
 
@@ -331,6 +343,5 @@ class LeaderboardMenu(tk.Frame):
 
 app = MainWindow()
 app.minsize(800,700)
-#app.resizable(0,0)
 app.title("Sudoku")
 app.mainloop()
