@@ -54,7 +54,7 @@ class MainMenu(tk.Frame):
 
         self.grid_columnconfigure(0, weight = 1)
 
-        self.grid_columnconfigure(1, weight = 3)
+        self.grid_columnconfigure(1, weight = 5)
 
         self.grid_columnconfigure(2, weight = 1)
 
@@ -186,11 +186,9 @@ class GameScreen(tk.Frame):
             while sdkBtn[randX][randY]['text']:
                 randX = random.randint(0,8)
                 randY = random.randint(0,8)
-            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY]  
-            numsShown += 1
 
-        for x in range(0,9):
-            print(str(fullBoard[x][0])+str(fullBoard[x][1])+str(fullBoard[x][2])+str(fullBoard[x][3])+str(fullBoard[x][4])+str(fullBoard[x][5])+str(fullBoard[x][6])+str(fullBoard[x][7])+str(fullBoard[x][8]))
+            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY] 
+            numsShown += 1
             
 
         #controler pre zmenu vlastnosti na danej pozicii v poli
@@ -202,6 +200,10 @@ class GameScreen(tk.Frame):
 
             for rows in range(0,9):
                 for columns in range(0,9):
+                    if not sdkBtn[rows][columns]['text']:
+                        isMatrixCorrect = False
+                        break;
+
                     if int(sdkBtn[rows][columns]['text']) != fullBoard[rows][columns]:
                         isMatrixCorrect = False
             print(str(isMatrixCorrect))
