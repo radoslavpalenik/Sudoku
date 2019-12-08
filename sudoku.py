@@ -3,6 +3,8 @@ import tkinter as tk
 import time
 
 
+
+
 class MainWindow(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -17,7 +19,7 @@ class MainWindow(tk.Tk):
 
         self.frames = {}
 
-        for F in (MainMenu, GameScreen,SettingsMenu, LeaderboardMenu):
+        for F in (MainMenu, GameScreen,SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu):
 
             frame = F(container, self)
 
@@ -25,9 +27,13 @@ class MainWindow(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(MainMenu)
+        self.show_frame(MainMenu, False)
 
-    def show_frame(self, cont):
+    def show_frame(self, cont, wasInGame):
+
+        if wasInGame and (cont == SettingsMenu):
+        	cont = backtoGameSettingsMenu
+        
 
         frame = self.frames[cont]
         frame.configure(bg = "#2c3c43")
@@ -66,7 +72,7 @@ class MainMenu(tk.Frame):
         tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).grid(row = 0, column = 1)
 
         Continue = tk.Button(self, text="Continue",highlightthickness = 0, width = 75, height = 3,
-                            command=lambda: controller.show_frame(GameScreen))
+                            command=lambda: controller.show_frame(GameScreen, False))
         Continue.configure(bg = "#a7e02c")
         #Continue.place(x=200,y=100)
         Continue.grid(row = 1, column = 1)
@@ -74,21 +80,21 @@ class MainMenu(tk.Frame):
 
 
         newGame = tk.Button(self, text="New Game",highlightthickness = 0, width = 75, height = 3,
-                            command=lambda: controller.show_frame(GameScreen))
+                            command=lambda: controller.show_frame(GameScreen, False))
         newGame.configure(bg = "#a7e02c")
         #newGame.place(x=200,y=200)
         newGame.grid(row = 3, column = 1)
 
 
         Settings = tk.Button(self, text="Settings",highlightthickness = 0, width = 75, height = 3,
-                            command=lambda: controller.show_frame(SettingsMenu))
+                            command=lambda: controller.show_frame(SettingsMenu, False))
         Settings.configure(bg = "#a7e02c")
         #Settings.place(x=200,y=300)
         Settings.grid(row = 5, column = 1)
 
         
         Leaderboard = tk.Button(self, text="Leaderboard",highlightthickness = 0, width = 75, height = 3,
-                            command=lambda: controller.show_frame(LeaderboardMenu))
+                            command=lambda: controller.show_frame(LeaderboardMenu, False))
         Leaderboard.configure(bg = "#a7e02c")
         #Leaderboard.place(x=200,y=400)
         Leaderboard.grid(row = 7, column = 1)
@@ -106,9 +112,9 @@ class GameScreen(tk.Frame):
 
         self.grid_columnconfigure(2, weight = 10)
 
-        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
+       # tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
 
-        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
+        #tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
 
         self.grid_rowconfigure(0, weight = 5)
         self.grid_rowconfigure(1, weight = 15)
@@ -121,20 +127,22 @@ class GameScreen(tk.Frame):
         tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).grid(row = 1, column = 1)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,
-                            command=lambda: controller.show_frame(MainMenu))
+                            command=lambda: controller.show_frame(MainMenu, False))
         backToMenu.configure(bg = "#a7e02c")
-        backToMenu.grid(row = 1, column = 0)
+        backToMenu.grid(row = 0, column = 0)
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,
-                            command=lambda: controller.show_frame(SettingsMenu))
+                            command=lambda: controller.show_frame(SettingsMenu, True))
         jumpToSettings.configure(bg = "#a7e02c")
-        jumpToSettings.grid(row = 1, column = 2)
+        jumpToSettings.grid(row = 0, column = 2)
 
 
 
 
         playMatrix = tk.Frame(self, bg = "#222e34",   height = 600)
         playMatrix.grid(column = 1, row = 2)
+
+        sdkBtn =  [[0 for x in range(9)] for x in range(9)]
 
         # Herny grid
        	for x in range(0,9):
@@ -143,21 +151,54 @@ class GameScreen(tk.Frame):
 
        	for rows in range(0,9):
        		for columns in range(0,9):
-       			tk.Label(playMatrix,text = "0", width = 10, height = 3).grid(row = rows, column = columns)
-       			pass
+       			sdkBtn[rows][columns] = tk.Button(playMatrix,text = str(rows)+str(columns), width = 10, height = 3, bg = "green", highlightthickness = 0,
+       			 command = lambda i=rows, j=columns : colorChange(i, j) )
+       			sdkBtn[rows][columns].grid(row = rows, column = columns)
+       	
+       	#controler pre zmenu vlastnosti na danej pozicii v poli
+       	def colorChange( x ,y):
+       		sdkBtn[x][y].configure(bg = "red")
        		pass
-       
+       	 
+
 
         
 class SettingsMenu(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        
 
         tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
 
+
+       
+       
+
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
-                            command=lambda: controller.show_frame(MainMenu))
+                            command=lambda: controller.show_frame(MainMenu, False))
+        backToMenu.configure(bg = "#a7e02c")
+        backToMenu.place(x=50,y=50)
+
+        numbersLeft = tk.Checkbutton(self, text ='Show count of each number left', 
+                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 150) 
+        validateGame = tk.Checkbutton(self, text ='Show button to validate your progress in game', 
+                     takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43", highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 200) 
+
+class backtoGameSettingsMenu(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        
+
+        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold")).place(x = 320, y=50)
+
+
+       
+       
+
+        backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1,
+                            command=lambda: controller.show_frame(GameScreen, False))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.place(x=50,y=50)
 
@@ -244,8 +285,12 @@ class LeaderboardMenu(tk.Frame):
         	nth_row+=1
 
 
+   
+
 app = MainWindow()
-app.minsize(800,600)
+app.minsize(800,700)
 #app.resizable(0,0)
 app.title("Sudoku")
 app.mainloop()
+
+
