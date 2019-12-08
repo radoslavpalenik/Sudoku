@@ -27,7 +27,7 @@ class MainWindow(tk.Tk):
 
         self.frames = {}
 
-        for F in (MainMenu, GameScreen,SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu):
+        for F in (MainMenu, GameScreen,SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu, SummaryScreen):
 
             frame = F(container, self)
 
@@ -125,9 +125,6 @@ class GameScreen(tk.Frame):
         #Koniec nastaveni okna Leaderboard
 
 
-    
-        tk.Label(self, text = "HERE WILL BE STOPWATCH", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).grid(row = 1, column = 1)
-
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
 
@@ -166,7 +163,7 @@ class GameScreen(tk.Frame):
 
 
                     sdkBtn[act_row][act_col] = tk.Button(playMatrix, text = fullBoard[act_row][act_col],width = 5, height = 3,
-                     bg = bgcol, fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal),
+                     bg = bgcol, fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal, controller),
                       highlightthickness = 0, bd = 0,)
                     sdkBtn[act_row][act_col].grid(row = rows, column = columns)
                 else:
@@ -174,13 +171,25 @@ class GameScreen(tk.Frame):
                         tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
                     else:
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
+       
 
                     
         #tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=1, row=0, rowspan=3, sticky='ns')
         #controler pre zmenu vlastnosti na danej pozicii v poli
-        def putValue(x, y, val):
+        def putValue( x, y, val, cont):
             print("changing value ["+str(x)+"]["+str(y)+"]")
             sdkBtn[x][y].configure(text = str(val))
+
+            isMatrixCorrect = True
+
+            for rows in range(0,9):
+                for columns in range(0,9):
+                    if int(sdkBtn[rows][columns]['text']) != fullBoard[rows][columns]:
+                        isMatrixCorrect = False
+            print(str(isMatrixCorrect))
+            if isMatrixCorrect:
+                cont.show_frame(SummaryScreen, False)
+
             
          
 
@@ -223,6 +232,19 @@ class backtoGameSettingsMenu(tk.Frame):
         validateGame = tk.Checkbutton(self, text ='Show button to validate your progress in game', 
                      takefocus = 0, bg = "#2c3c43", activebackground = "#2c3c43",
                      highlightthickness = 0, font=(20), fg = "#7aa719").place(x = 150, y = 200) 
+
+class SummaryScreen(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        
+
+        tk.Label(self, text = "You did it!", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 50, "bold", "italic")).place(x = 250, y=250)
+        tk.Label(self, text = "Your final time will be here", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
+
+
+        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
+                            command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
 
 
 
