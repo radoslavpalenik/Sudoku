@@ -9,9 +9,9 @@ inputVal = 1
 
 
 def selectValue(val):
-	global inputVal
-	print(str(val))
-	inputVal = val
+    global inputVal
+    print(str(val))
+    inputVal = val
 
 class MainWindow(tk.Tk):
 
@@ -40,7 +40,7 @@ class MainWindow(tk.Tk):
     def show_frame(self, cont, wasInGame):
 
         if wasInGame and (cont == SettingsMenu):
-        	cont = backtoGameSettingsMenu
+            cont = backtoGameSettingsMenu
         
 
         frame = self.frames[cont]
@@ -113,10 +113,10 @@ class GameScreen(tk.Frame):
         for x in range(0,9):
 
 
-        	tk.Button(leftBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
-        	 highlightthickness = 0, bd = 0, pady = 25, padx = 20,
-        	  command = lambda val = x+1: selectValue(val)).grid(column = 0, row = x)
-        	
+            tk.Button(leftBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
+             highlightthickness = 0, bd = 0, pady = 25, padx = 20,
+              command = lambda val = x+1: selectValue(val)).grid(column = 0, row = x)
+            
 
         self.grid_rowconfigure(0, weight = 5)
         self.grid_rowconfigure(1, weight = 15)
@@ -143,15 +143,16 @@ class GameScreen(tk.Frame):
         fullBoard = mapGenerator.make_board(3)
 
         # Herny grid
-       	for x in range(0,9):
-       		playMatrix.grid_columnconfigure(x, weight = 1)
-       		playMatrix.grid_rowconfigure(x, weight = 1)
+        for x in range(0,9):
+            playMatrix.grid_columnconfigure(x, weight = 1)
+            playMatrix.grid_rowconfigure(x, weight = 1)
 
-       	for rows in range(0,11):
+        for rows in range(0,11):
             for columns in range(0,11):
                 if columns != 3 and columns != 7 and rows != 3 and rows != 7:
                     act_col = columns
                     act_row = rows
+                    bgcol = "#2c3c43"
                     if columns > 3:
                         if columns > 7:
                             act_col = act_col -1
@@ -160,11 +161,14 @@ class GameScreen(tk.Frame):
                         if rows > 7:
                             act_row = act_row -1
                         act_row = act_row -1
+                    if ((columns <= 2 or columns >= 7) and (rows <= 2 or rows >=7)) or ((columns > 2 and columns < 7 ) and (rows > 3 and rows < 8)) :
+                        bgcol = "#4a6571"
 
 
-                    sdkBtn[act_row][act_col] = tk.Button(playMatrix, text = fullBoard[act_row][act_col],width = 6, height = 4,
-                     bg = "#2c3c43", fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal),
-                      highlightthickness = 0, bd = 0,).grid(row = rows, column = columns)
+                    sdkBtn[act_row][act_col] = tk.Button(playMatrix, text = fullBoard[act_row][act_col],width = 5, height = 3,
+                     bg = bgcol, fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal),
+                      highlightthickness = 0, bd = 0,)
+                    sdkBtn[act_row][act_col].grid(row = rows, column = columns)
                 else:
                     if rows == 3 or rows == 7:
                         tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
@@ -172,13 +176,13 @@ class GameScreen(tk.Frame):
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
 
                     
-       	#tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=1, row=0, rowspan=3, sticky='ns')
-       	#controler pre zmenu vlastnosti na danej pozicii v poli
-       	def putValue(x, y, val):
+        #tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=1, row=0, rowspan=3, sticky='ns')
+        #controler pre zmenu vlastnosti na danej pozicii v poli
+        def putValue(x, y, val):
             print("changing value ["+str(x)+"]["+str(y)+"]")
             sdkBtn[x][y].configure(text = str(val))
-       		
-       	 
+            
+         
 
 
         
@@ -284,22 +288,22 @@ class LeaderboardMenu(tk.Frame):
 
         for pos in range(1,11):
 
-        	if (nth_row % 2) :
-        		bgcol = "#4a6571"
-        	else:
-        		bgcol = "#7aa719"
+            if (nth_row % 2) :
+                bgcol = "#4a6571"
+            else:
+                bgcol = "#7aa719"
 
 
-        	topRecordPosition = tk.Label(table, text = pos, width = 15, height = 3, bg = bgcol)
-        	topRecordPosition.grid(column = 0, row =pos)
+            topRecordPosition = tk.Label(table, text = pos, width = 15, height = 3, bg = bgcol)
+            topRecordPosition.grid(column = 0, row =pos)
 
-        	topRecordTime = tk.Label(table, text = "Best Time " + str(pos), width = 35, height = 3, bg = bgcol)
-        	topRecordTime.grid(column = 1, row =pos)
+            topRecordTime = tk.Label(table, text = "Best Time " + str(pos), width = 35, height = 3, bg = bgcol)
+            topRecordTime.grid(column = 1, row =pos)
 
-        	topRecordDate = tk.Label(table, text = "Date of time", width = 25, height = 3, bg = bgcol)
-        	topRecordDate.grid(column = 2, row =pos)
+            topRecordDate = tk.Label(table, text = "Date of time", width = 25, height = 3, bg = bgcol)
+            topRecordDate.grid(column = 2, row =pos)
 
-        	nth_row+=1
+            nth_row+=1
 
    
 
