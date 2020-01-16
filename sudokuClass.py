@@ -14,17 +14,17 @@ class Sudoku():
     '''
     gameBoard = 0
     box = [[0 for x in range(9)] for y in range(9)]
-    def __init__(self):
+    def __init__(self, Level):
         '''
         init block contains 9 boxes
         '''
-        self.gameBoard = mapGenerator.generateGameBoard()
+        self.gameBoard = mapGenerator.generateGameBoard(Level)
         for x in range(0,9):
                 for y in range (0,9):
                     self.box[x][y] = boxClass.Box(self.gameBoard[x][y])
 
-    def reset(self): 
-        self.gameBoard = mapGenerator.generateGameBoard()
+    def reset(self, Level): 
+        self.gameBoard = mapGenerator.generateGameBoard(Level)
         for x in range(0,9):
             for y in range (0,9):
                 self.box[x][y] = boxClass.Box(self.gameBoard[x][y])

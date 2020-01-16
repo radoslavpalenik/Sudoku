@@ -31,9 +31,18 @@ def make_board(m=3):
     return search()
 
 
-def generateMask():
+def generateMask(Level):
     mask = [[0 for x in range(9)] for y in range(9)]
-    maskTemplate = [0,0,0,0,0,0,1,0,0]
+
+    if Level == 1:
+        maskTemplate = [1,0,0,0,0,0,0,1,1]
+    elif Level == 2:
+        maskTemplate = [1,0,1,0,1,0,0,1,1]
+    elif Level == 3:
+        maskTemplate = [1,0,1,0,1,1,0,1,1]
+    else:
+        maskTemplate = [1,1,1,1,1,1,1,1,1]
+
     for x in range(0,9):
         random.shuffle(maskTemplate)
         for y in range (0,9):  
@@ -41,18 +50,19 @@ def generateMask():
 
     return mask
 
-def generateGameBoard():
+def generateGameBoard(Level):
     gameBoard = [[0 for x in range(9)] for y in range(9)]
     global solvedBoard
     solvedBoard = make_board(3)
 
-    print("--------------Full Matrix----------------")
+    print("\n-----------------------------------------------------------------------------------\n\t\t\t\t  New Game \n-----------------------------------------------------------------------------------\n")
+    print("-----------------------------------Full Matrix-------------------------------------")
     for x in range(0,9):
-            print(str(solvedBoard[x][0])+str(solvedBoard[x][1])+str(solvedBoard[x][2])+str(solvedBoard[x][3])+str(solvedBoard[x][4])+str(solvedBoard[x][5])+str(solvedBoard[x][6])+str(solvedBoard[x][7])+str(solvedBoard[x][8]))
+            print("\t["+str(solvedBoard[x][0])+"\t"+str(solvedBoard[x][1])+"\t"+str(solvedBoard[x][2])+"\t"+str(solvedBoard[x][3])+"\t"+str(solvedBoard[x][4])+"\t"+str(solvedBoard[x][5])+"\t"+str(solvedBoard[x][6])+"\t"+str(solvedBoard[x][7])+"\t"+str(solvedBoard[x][8])+ "\t]")
  
 
     
-    mask = generateMask()
+    mask = generateMask(Level)
     for x in range(0,9):
         for y in range (0,9):
             if(mask[x][y] == 0):
@@ -60,9 +70,9 @@ def generateGameBoard():
             else:
                 gameBoard[x][y] = None
 
-    print("------------Matrix to solve--------------")
+    print("---------------------------------Matrix to solve-----------------------------------")
     for x in range(0,9):
-            print(str(gameBoard[x][0])+str(gameBoard[x][1])+str(gameBoard[x][2])+str(gameBoard[x][3])+str(gameBoard[x][4])+str(gameBoard[x][5])+str(gameBoard[x][6])+str(gameBoard[x][7])+str(gameBoard[x][8]))
+            print("\t["+str(gameBoard[x][0])+"\t"+str(gameBoard[x][1])+"\t"+str(gameBoard[x][2])+"\t"+str(gameBoard[x][3])+"\t"+str(gameBoard[x][4])+"\t"+str(gameBoard[x][5])+"\t"+str(gameBoard[x][6])+"\t"+str(gameBoard[x][7])+"\t"+str(gameBoard[x][8])+ "\t]")
  
     
     

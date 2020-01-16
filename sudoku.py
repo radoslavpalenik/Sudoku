@@ -14,7 +14,7 @@ import sudokuClass as sc
 inputVal = 1
 seconds = 0
 minutes = 0
-sudoku = sc.Sudoku()
+sudoku = sc.Sudoku(0)
 sdkBtn =  [[0 for x in range(11)] for x in range(11)]
 beforeFirstGame = 1
 
@@ -48,7 +48,7 @@ class MainWindow(tk.Tk):
         self.seconds = 0
         self.minutes = 0
         # label displaying time
-        self.label = tk.Label(self, text="0 s", font="Arial 30", width=10 , bg ="#2c3c43", foreground = "#a7e02c")
+        self.label = tk.Label(self, text="0 s", font="Arial 30", width=80 , bg ="#2c3c43", foreground = "#a7e02c")
         self.label.pack()
         # start the timer
         self.label.after(10, self.refresh_label)
@@ -61,7 +61,7 @@ class MainWindow(tk.Tk):
 
         self.frames = {}
 
-        for F in (MainMenu, GameScreen, SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu, SummaryScreen):
+        for F in (MainMenu, GameScreen, SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu, SummaryScreen, levelSelect):
 
             frame = F(container, self)
 
@@ -69,9 +69,9 @@ class MainWindow(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(MainMenu, False, False)
+        self.show_frame(MainMenu, False, False,0)
 
-    def show_frame(self, cont, wasInGame, isNewGame):
+    def show_frame(self, cont, wasInGame, isNewGame, Level):
 
         global minutes
         global seconds
@@ -92,8 +92,8 @@ class MainWindow(tk.Tk):
 	            for y in range (0,9):
 	                sdkBtn[x][y].configure(text = "")
 
-        	
-        	sudoku.reset()
+        	if Level > 0:
+        		sudoku.reset(Level)
 
 
 
@@ -109,6 +109,9 @@ class MainWindow(tk.Tk):
 
         elif cont == LeaderboardMenu:
             self.screen.actualScreen = 3
+
+        elif cont == levelSelect:
+            self.screen.actualScreen = 5
 
         elif cont == SummaryScreen:
             self.screen.actualScreen = 4
@@ -143,6 +146,9 @@ class MainWindow(tk.Tk):
         elif self.screen.actualScreen == 3:
             self.label.configure(text = "Leaderboard")
 
+        elif self.screen.actualScreen == 5:
+            self.label.configure(text = "Choose game difficulty")
+
         elif self.screen.actualScreen == 4:
             self.label.configure(fg = "#2c3c43")
            
@@ -175,6 +181,8 @@ class MainWindow(tk.Tk):
         self.label.after(100, self.refresh_label)
 
 
+
+
 class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -204,19 +212,19 @@ class MainMenu(tk.Frame):
         #Koniec nastaveni okna Menu
 
         self.Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c", 
-                            command=lambda: controller.show_frame(GameScreen, False, False))
+                            command=lambda: controller.show_frame(GameScreen, False, False,0))
         self.Continue.grid(row = 1, column = 1)
         
         self.Continue.after(10, self.checkIfContinue)
 
         newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(GameScreen, False, True)).grid(row = 3, column = 1)
+                            command=lambda: controller.show_frame(levelSelect, False, True,0)).grid(row = 3, column = 1)
 
         Settings = tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(SettingsMenu, False, False)).grid(row = 5, column = 1)
+                            command=lambda: controller.show_frame(SettingsMenu, False, False,0)).grid(row = 5, column = 1)
 
         Leaderboard = tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(LeaderboardMenu, False, False)).grid(row = 7, column = 1)
+                            command=lambda: controller.show_frame(LeaderboardMenu, False, False,0)).grid(row = 7, column = 1)
 
     def checkIfContinue(self):
         	global beforeFirstGame
@@ -266,10 +274,10 @@ class GameScreen(tk.Frame):
 
         #Horna Navigacia
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 0)
+                            command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 0)
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(SettingsMenu, True, False)).grid(row = 0, column = 2)
+                            command=lambda: controller.show_frame(SettingsMenu, True, False,0)).grid(row = 0, column = 2)
 
        
  
@@ -328,7 +336,7 @@ class GameScreen(tk.Frame):
             sudoku.gameBoard[x][y] = val
         
             if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
-                cont.show_frame(SummaryScreen, False, False)
+                cont.show_frame(SummaryScreen, False, False,0)
         
 class SettingsMenu(tk.Frame):
 
@@ -343,10 +351,10 @@ class SettingsMenu(tk.Frame):
 
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
-                           command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 0)
+                           command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(SummaryScreen, False, False)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(SummaryScreen, False, False,0)).grid(row = 0, column = 3)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
@@ -373,10 +381,10 @@ class backtoGameSettingsMenu(tk.Frame):
 
 
         backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
-                           command=lambda: controller.show_frame(GameScreen, False, False)).grid(row = 0, column = 0)
+                           command=lambda: controller.show_frame(GameScreen, False, False,0)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 3)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
@@ -406,7 +414,10 @@ class SummaryScreen(tk.Frame):
         self.timeLabel.after(10, self.chcekTime)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False, False)).place(x=50,y=50)
+                            command=lambda: controller.show_frame(MainMenu, False, False,0)).place(x=50,y=50)
+        
+        global beforeFirstGame
+        beforeFirstGame = 1
 
     def chcekTime(self):
 	        global minutes
@@ -441,7 +452,7 @@ class LeaderboardMenu(tk.Frame):
         #Koniec nastaveni okna Leaderboard
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
-                            command=lambda: controller.show_frame(MainMenu, False, False))
+                            command=lambda: controller.show_frame(MainMenu, False, False,0))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.grid(row = 1, column = 0)
 
@@ -492,9 +503,49 @@ class LeaderboardMenu(tk.Frame):
 
             nth_row+=1
 
+class levelSelect(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+       	self.grid_columnconfigure(0, weight = 1)
+
+        self.grid_columnconfigure(1, weight = 5)
+
+        self.grid_columnconfigure(2, weight = 1)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 0, row =0)
+
+        tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
+
+        self.grid_rowconfigure(0, weight = 20)
+        self.grid_rowconfigure(1, weight = 10)
+        self.grid_rowconfigure(2, weight = 5)
+        self.grid_rowconfigure(3, weight = 10)
+        self.grid_rowconfigure(4, weight = 5)
+        self.grid_rowconfigure(5, weight = 10)
+        self.grid_rowconfigure(6, weight = 40)
+
+         
+
+        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
+                            command=lambda: controller.show_frame(MainMenu, False, False,0)).place(x=50,y=50)
+        
+
+        tk.Button(self, text="Easy", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+                            command=lambda: controller.show_frame(GameScreen, False, True,1)).grid(row = 1, column = 1)
+
+        tk.Button(self, text="Medium", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+                            command=lambda: controller.show_frame(GameScreen, False, True,2)).grid(row = 3, column = 1)
+
+        tk.Button(self, text="Hard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+                            command=lambda: controller.show_frame(GameScreen, False, True,3)).grid(row = 5, column = 1)
+
+
+
    
 app = MainWindow()
-app.minsize(900,700)
+app.minsize(800,600)
 app.title("Sudoku")
 app.configure(bg = "#2c3c43")
 for i in range(1,10):
