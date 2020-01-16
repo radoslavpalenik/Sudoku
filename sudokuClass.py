@@ -18,12 +18,17 @@ class Sudoku():
         '''
         init block contains 9 boxes
         '''
+        self.gameBoard = mapGenerator.generateGameBoard()
+        for x in range(0,9):
+                for y in range (0,9):
+                    self.box[x][y] = boxClass.Box(self.gameBoard[x][y])
 
-        
+    def reset(self): 
         self.gameBoard = mapGenerator.generateGameBoard()
         for x in range(0,9):
             for y in range (0,9):
                 self.box[x][y] = boxClass.Box(self.gameBoard[x][y])
+        print("I was heere")
 
 
     

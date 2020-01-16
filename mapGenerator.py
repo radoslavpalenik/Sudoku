@@ -33,7 +33,7 @@ def make_board(m=3):
 
 def generateMask():
     mask = [[0 for x in range(9)] for y in range(9)]
-    maskTemplate = [0,0,0,0,0,0,0,0,0]
+    maskTemplate = [0,0,0,0,0,0,1,0,0]
     for x in range(0,9):
         random.shuffle(maskTemplate)
         for y in range (0,9):  
@@ -45,7 +45,12 @@ def generateGameBoard():
     gameBoard = [[0 for x in range(9)] for y in range(9)]
     global solvedBoard
     solvedBoard = make_board(3)
+
+    print("----------------------------------")
+    for x in range(0,9):
+            print(str(solvedBoard[x][0])+str(solvedBoard[x][1])+str(solvedBoard[x][2])+str(solvedBoard[x][3])+str(solvedBoard[x][4])+str(solvedBoard[x][5])+str(solvedBoard[x][6])+str(solvedBoard[x][7])+str(solvedBoard[x][8]))
  
+
     
     mask = generateMask()
     for x in range(0,9):
@@ -55,6 +60,10 @@ def generateGameBoard():
             else:
                 gameBoard[x][y] = None
 
+    print("----------------------------------")
+    for x in range(0,9):
+            print(str(gameBoard[x][0])+str(gameBoard[x][1])+str(gameBoard[x][2])+str(gameBoard[x][3])+str(gameBoard[x][4])+str(gameBoard[x][5])+str(gameBoard[x][6])+str(gameBoard[x][7])+str(gameBoard[x][8]))
+ 
     
     
     
