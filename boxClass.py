@@ -1,3 +1,5 @@
+import mapGenerator
+
 class Box():
     '''
     Smallest unit of game field.
@@ -7,24 +9,16 @@ class Box():
         '''
         initialize box variables
         '''
-
         #if value is seted by default, box will be locked, beacause user can't set another, than default value
-        if (value in range(1,9)):
-            self.lock = True
-            self.value = val
-        else:
-            self.lock = False
-            self.value = 0  #value insade box
-
-        self.tip = set()   #list, which will contain hint by user
-
+        self.lock = False
+        self.value = val
 
     def setValue(self, value):
         '''
         value insertion
         '''
         if ((value in range(0,9)) and (not self.lock)):
-            self.value = value
+            self.configure(text = value)
 
 
     def setTip(self, tip):

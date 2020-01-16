@@ -3,7 +3,7 @@ import tkinter.ttk
 import random
 import mapGenerator
 import boxClass
-import sudokuClass
+import sudokuClass as sc
 
 #   ITU, 2019, 2BIT
 #   Authors: Radoslav Páleník <xpalen05@stud.fit.vutbr.cz>, Daniel Pohančaník <xpohan03@stud.fit.vutbr.cz>, Michal Řezáč <xrezac20@stud.fit.vutbr.cz>
@@ -11,6 +11,8 @@ import sudokuClass
 
 #Hodnota, ktorou sa zadáva vstup z myši do poľa
 inputVal = 1
+matrix = [[0 for x in range(9)] for y in range(9)]
+#sudoku = sc.Sudoku()
 
 def selectValue(val):
     global inputVal
@@ -83,16 +85,16 @@ class MainMenu(tk.Frame):
 
         tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).grid(row = 0, column = 1)
 
-        Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
+        tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
                             command=lambda: controller.show_frame(GameScreen, False)).grid(row = 1, column = 1)
 
-        newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+        tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(GameScreen, False)).grid(row = 3, column = 1)
 
-        Settings = tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+        tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, False)).grid(row = 5, column = 1)
 
-        Leaderboard = tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
+        tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(LeaderboardMenu, False)).grid(row = 7, column = 1)
 
 
@@ -125,10 +127,10 @@ class GameScreen(tk.Frame):
         #Koniec nastaveni okna Leaderboard
 
         #Horna Navigacia
-        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
+        tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
 
-        jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
+        tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, True)).grid(row = 0, column = 2)
  
         #Matica 9x9
@@ -136,9 +138,11 @@ class GameScreen(tk.Frame):
         playMatrix.grid(column = 1, row = 2)
 
         sdkBtn =  [[0 for x in range(11)] for x in range(11)]
+        
+
 
         #Generovanie Matice 
-        fullBoard = mapGenerator.make_board(3)
+        
 
         # Game grid
         for x in range(0,9):
@@ -177,51 +181,24 @@ class GameScreen(tk.Frame):
                         tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
                     else:
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
-
-        #Vyplnenie nahodnych cislic, tak aby boli na kazdom riadku vyplnene aspon 2 a celkovo 24 cislic v celej matici
+        
+        sudoku = sc.Sudoku()
         for x in range(0,9):
-            toShowPosition = random.randint(0,8)
-            sdkBtn[x][toShowPosition]['text'] = fullBoard[x][toShowPosition]
-            sdkBtn[x][toShowPosition].configure(state = "disabled")
-            toShowAnotherPosition = random.randint(0,8)
-            while toShowAnotherPosition == toShowPosition:
-                toShowAnotherPosition = random.randint(0,8)
-            sdkBtn[x][toShowAnotherPosition]['text'] =  fullBoard[x][toShowAnotherPosition]
-            sdkBtn[x][toShowAnotherPosition].configure(state = "disabled")
-            
-
-        numsShown = 18
-        while numsShown < 25:
-            randX = random.randint(0,8)
-            randY = random.randint(0,8)
-
-            while sdkBtn[randX][randY]['text']:
-                randX = random.randint(0,8)
-                randY = random.randint(0,8)
-
-            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY]
-            sdkBtn[randX][randY].configure(state = "disabled")
-            numsShown += 1
-            
-
+            for y in range (0,9):
+                sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
+    
+                
+        
+       
         #controler pre zmenu vlastnosti na danej pozicii v poli
         def putValue( x, y, val, cont):
-            print("changing value ["+str(x)+"]["+str(y)+"]")
             sdkBtn[x][y].configure(text = str(val))
-
-            isMatrixCorrect = True
-
-            for rows in range(0,9):
-                for columns in range(0,9):
-                    if not sdkBtn[rows][columns]['text']:
-                        isMatrixCorrect = False
-                        break;
-
-                    if int(sdkBtn[rows][columns]['text']) != fullBoard[rows][columns]:
-                        isMatrixCorrect = False
-            print(str(isMatrixCorrect))
-            if isMatrixCorrect:
+            sudoku.gameBoard[x][y] = val
+            
+            if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
                 cont.show_frame(SummaryScreen, False)
+                
+                
         
 class SettingsMenu(tk.Frame):
 
@@ -235,7 +212,7 @@ class SettingsMenu(tk.Frame):
         self.grid_columnconfigure(2,weight = 1)
 
 
-        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
+        tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
                            command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
@@ -267,7 +244,7 @@ class backtoGameSettingsMenu(tk.Frame):
         self.grid_columnconfigure(2,weight = 1)
 
 
-        backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
+        tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
                            command=lambda: controller.show_frame(GameScreen, False)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
@@ -297,7 +274,7 @@ class SummaryScreen(tk.Frame):
         tk.Label(self, text = "Your time: {0}:{1}".format(random.randint(0,3), random.randint(0,59)), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
 
 
-        backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
+        tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
 
 
