@@ -28,7 +28,7 @@ class Sudoku():
         for x in range(0,9):
             for y in range (0,9):
                 self.box[x][y] = boxClass.Box(self.gameBoard[x][y])
-        print("I was heere")
+
 
 
     

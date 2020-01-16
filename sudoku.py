@@ -16,6 +16,7 @@ seconds = 0
 minutes = 0
 sudoku = sc.Sudoku()
 sdkBtn =  [[0 for x in range(11)] for x in range(11)]
+beforeFirstGame = 1
 
 
 def selectValue(val):
@@ -76,6 +77,7 @@ class MainWindow(tk.Tk):
         global seconds
         global sudoku
         global sdkBtn
+        global beforeFirstGame
 
         if wasInGame and (cont == SettingsMenu):
             cont = backtoGameSettingsMenu
@@ -83,6 +85,8 @@ class MainWindow(tk.Tk):
         if isNewGame:
         	seconds = 0
         	minutes = 0
+        	beforeFirstGame = 0
+
 
         	for x in range(0,9):
 	            for y in range (0,9):
@@ -199,8 +203,11 @@ class MainMenu(tk.Frame):
 
         #Koniec nastaveni okna Menu
 
-        Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", #state = "disabled",
-                            command=lambda: controller.show_frame(GameScreen, False, False)).grid(row = 1, column = 1)
+        self.Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c", 
+                            command=lambda: controller.show_frame(GameScreen, False, False))
+        self.Continue.grid(row = 1, column = 1)
+        
+        self.Continue.after(10, self.checkIfContinue)
 
         newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(GameScreen, False, True)).grid(row = 3, column = 1)
@@ -211,6 +218,15 @@ class MainMenu(tk.Frame):
         Leaderboard = tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(LeaderboardMenu, False, False)).grid(row = 7, column = 1)
 
+    def checkIfContinue(self):
+        	global beforeFirstGame
+
+        	if beforeFirstGame == 1:
+        		self.Continue.configure(state = "disabled",bg = "#7aa719")
+        	else:
+        		self.Continue.configure(state = "normal",bg = "#a7e02c")
+
+        	self.Continue.after(100, self.checkIfContinue)
 
 class GameScreen(tk.Frame):
 

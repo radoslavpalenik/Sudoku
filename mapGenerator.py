@@ -46,7 +46,7 @@ def generateGameBoard():
     global solvedBoard
     solvedBoard = make_board(3)
 
-    print("----------------------------------")
+    print("--------------Full Matrix----------------")
     for x in range(0,9):
             print(str(solvedBoard[x][0])+str(solvedBoard[x][1])+str(solvedBoard[x][2])+str(solvedBoard[x][3])+str(solvedBoard[x][4])+str(solvedBoard[x][5])+str(solvedBoard[x][6])+str(solvedBoard[x][7])+str(solvedBoard[x][8]))
  
@@ -60,7 +60,7 @@ def generateGameBoard():
             else:
                 gameBoard[x][y] = None
 
-    print("----------------------------------")
+    print("------------Matrix to solve--------------")
     for x in range(0,9):
             print(str(gameBoard[x][0])+str(gameBoard[x][1])+str(gameBoard[x][2])+str(gameBoard[x][3])+str(gameBoard[x][4])+str(gameBoard[x][5])+str(gameBoard[x][6])+str(gameBoard[x][7])+str(gameBoard[x][8]))
  
