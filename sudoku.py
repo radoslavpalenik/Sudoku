@@ -65,12 +65,19 @@ class MainWindow(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(MainMenu, False)
+        self.show_frame(MainMenu, False, False)
 
-    def show_frame(self, cont, wasInGame):
+    def show_frame(self, cont, wasInGame, isNewGame):
+
+        global minutes
+        global seconds
 
         if wasInGame and (cont == SettingsMenu):
             cont = backtoGameSettingsMenu
+
+        if isNewGame:
+        	seconds = 0
+        	minutes = 0
 
         if cont == GameScreen:
             self.screen.actualScreen = 1
@@ -175,16 +182,16 @@ class MainMenu(tk.Frame):
         #Koniec nastaveni okna Menu
 
         Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
-                            command=lambda: controller.show_frame(GameScreen, False)).grid(row = 1, column = 1)
+                            command=lambda: controller.show_frame(GameScreen, False, False)).grid(row = 1, column = 1)
 
         newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(GameScreen, False)).grid(row = 3, column = 1)
+                            command=lambda: controller.show_frame(GameScreen, False, True)).grid(row = 3, column = 1)
 
         Settings = tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(SettingsMenu, False)).grid(row = 5, column = 1)
+                            command=lambda: controller.show_frame(SettingsMenu, False, False)).grid(row = 5, column = 1)
 
         Leaderboard = tk.Button(self, text="Leaderboard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(LeaderboardMenu, False)).grid(row = 7, column = 1)
+                            command=lambda: controller.show_frame(LeaderboardMenu, False, False)).grid(row = 7, column = 1)
 
 
 class GameScreen(tk.Frame):
@@ -225,10 +232,10 @@ class GameScreen(tk.Frame):
 
         #Horna Navigacia
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
+                            command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 0)
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(SettingsMenu, True)).grid(row = 0, column = 2)
+                            command=lambda: controller.show_frame(SettingsMenu, True, False)).grid(row = 0, column = 2)
 
        
  
@@ -293,7 +300,7 @@ class GameScreen(tk.Frame):
             if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
                 print(str(seconds) + "compare")
                 print(str(minutes) + "compare")
-                cont.show_frame(SummaryScreen, False)
+                cont.show_frame(SummaryScreen, False, False)
         
 class SettingsMenu(tk.Frame):
 
@@ -308,10 +315,10 @@ class SettingsMenu(tk.Frame):
 
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
-                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 0)
+                           command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(SummaryScreen, False)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(SummaryScreen, False, False)).grid(row = 0, column = 3)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
@@ -338,10 +345,10 @@ class backtoGameSettingsMenu(tk.Frame):
 
 
         backToMenu = tk.Button(self, text="Back to Game",highlightthickness = 0, width = 10, height = 1, bg = "#a7e02c",
-                           command=lambda: controller.show_frame(GameScreen, False)).grid(row = 0, column = 0)
+                           command=lambda: controller.show_frame(GameScreen, False, False)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(MainMenu, False, False)).grid(row = 0, column = 3)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
@@ -362,15 +369,25 @@ class SummaryScreen(tk.Frame):
         
         global seconds
         global minutes
-        print(str(minutes) + "summary")
-        print(str(seconds) + "summary")
-        tk.Label(self, text = "You did it!", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 50, "bold", "italic")).place(x = 250, y=250)
-        tk.Label(self, text = "Your time: {0:02d}:{1:02d}".format(minutes, seconds), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
 
+        tk.Label(self, text = "You did it!", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 50, "bold", "italic")).place(x = 250, y=250)
+        self.timeLabel = tk.Label(self, text = "Your time: {0:02d}:{1:02d}".format(minutes, seconds), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold"))
+        self.timeLabel.place(x = 450, y = 350)
+
+
+        self.timeLabel.after(10, self.chcekTime)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False)).place(x=50,y=50)
+                            command=lambda: controller.show_frame(MainMenu, False, False)).place(x=50,y=50)
 
+    def chcekTime(self):
+	        global minutes
+	        global seconds
+
+	        self.timeLabel.configure(text="%.2i" % minutes+" : %.2i" % seconds)
+	        self.timeLabel.after(100, self.chcekTime)
+
+        
 
 class LeaderboardMenu(tk.Frame):
 
@@ -396,7 +413,7 @@ class LeaderboardMenu(tk.Frame):
         #Koniec nastaveni okna Leaderboard
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
-                            command=lambda: controller.show_frame(MainMenu, False))
+                            command=lambda: controller.show_frame(MainMenu, False, False))
         backToMenu.configure(bg = "#a7e02c")
         backToMenu.grid(row = 1, column = 0)
 
