@@ -14,17 +14,20 @@ import sudokuClass as sc
 inputVal = 1
 seconds = 0
 minutes = 0
+sudoku = sc.Sudoku()
+sdkBtn =  [[0 for x in range(11)] for x in range(11)]
+
 
 def selectValue(val):
     global inputVal
-    print(str(val))
+    print(str(val+100))
     inputVal = val
 
 def selectKeyboardValue(val):
     global inputVal
     print(val.char)
     val = val.char
-    selectValue(val)
+    selectValue(int(val))
 
 class TopScreenStruct:
     def __init__(self):
@@ -71,6 +74,8 @@ class MainWindow(tk.Tk):
 
         global minutes
         global seconds
+        global sudoku
+        global sdkBtn
 
         if wasInGame and (cont == SettingsMenu):
             cont = backtoGameSettingsMenu
@@ -78,6 +83,19 @@ class MainWindow(tk.Tk):
         if isNewGame:
         	seconds = 0
         	minutes = 0
+
+        	for x in range(0,9):
+	            for y in range (0,9):
+	                sdkBtn[x][y].configure(text = "")
+
+        	
+        	sudoku.reset()
+
+
+
+	        for x in range(0,9):
+	            for y in range (0,9):
+	                sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
 
         if cont == GameScreen:
             self.screen.actualScreen = 1
@@ -181,7 +199,7 @@ class MainMenu(tk.Frame):
 
         #Koniec nastaveni okna Menu
 
-        Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
+        Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", #state = "disabled",
                             command=lambda: controller.show_frame(GameScreen, False, False)).grid(row = 1, column = 1)
 
         newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
@@ -243,8 +261,7 @@ class GameScreen(tk.Frame):
         playMatrix = tk.Frame(self, bg = "#222e34")
         playMatrix.grid(column = 1, row = 2)
 
-        sdkBtn =  [[0 for x in range(11)] for x in range(11)]
-
+        
 
         # Game grid
         for x in range(0,9):
@@ -286,11 +303,8 @@ class GameScreen(tk.Frame):
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
 
    
-            
-        sudoku = sc.Sudoku()
-        for x in range(0,9):
-            for y in range (0,9):
-                sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
+        global sudoku
+       
 
         #controler pre zmenu vlastnosti na danej pozicii v poli
         def putValue( x, y, val, cont):
@@ -298,8 +312,6 @@ class GameScreen(tk.Frame):
             sudoku.gameBoard[x][y] = val
         
             if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
-                print(str(seconds) + "compare")
-                print(str(minutes) + "compare")
                 cont.show_frame(SummaryScreen, False, False)
         
 class SettingsMenu(tk.Frame):
