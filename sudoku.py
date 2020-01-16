@@ -3,7 +3,8 @@ import tkinter.ttk
 import random
 import mapGenerator
 import boxClass
-import sudokuClass
+import sudokuClass as sc
+
 
 #   ITU, 2019, 2BIT
 #   Authors: Radoslav Páleník <xpalen05@stud.fit.vutbr.cz>, Daniel Pohančaník <xpohan03@stud.fit.vutbr.cz>, Michal Řezáč <xrezac20@stud.fit.vutbr.cz>
@@ -11,27 +12,52 @@ import sudokuClass
 
 #Hodnota, ktorou sa zadáva vstup z myši do poľa
 inputVal = 1
+seconds = 0
+minutes = 0
 
 def selectValue(val):
     global inputVal
     print(str(val))
     inputVal = val
 
+def selectKeyboardValue(val):
+    global inputVal
+    print(val.char)
+    val = val.char
+    selectValue(val)
+
+class TopScreenStruct:
+    def __init__(self):
+        self.actualScreen = 0
+
 class MainWindow(tk.Tk):
 
     def __init__(self, *args, **kwargs):
-        
         tk.Tk.__init__(self, *args, **kwargs)
         container = tk.Frame(self)
+    
+        self.screen = TopScreenStruct()
+        global seconds
+        global minutes
+        seconds = 0
+        minutes = 0
+        self.seconds = 0
+        self.minutes = 0
+        # label displaying time
+        self.label = tk.Label(self, text="0 s", font="Arial 30", width=10 , bg ="#2c3c43", foreground = "#a7e02c")
+        self.label.pack()
+        # start the timer
+        self.label.after(10, self.refresh_label)
 
-        container.pack(side="top", fill="both", expand = True)
+        container.pack(side="bottom",  fill = "both")
 
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+
         self.frames = {}
 
-        for F in (MainMenu, GameScreen,SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu, SummaryScreen):
+        for F in (MainMenu, GameScreen, SettingsMenu, LeaderboardMenu, backtoGameSettingsMenu, SummaryScreen):
 
             frame = F(container, self)
 
@@ -45,12 +71,81 @@ class MainWindow(tk.Tk):
 
         if wasInGame and (cont == SettingsMenu):
             cont = backtoGameSettingsMenu
-        
+
+        if cont == GameScreen:
+            self.screen.actualScreen = 1
+
+        elif cont == SettingsMenu or cont == backtoGameSettingsMenu:
+            self.screen.actualScreen = 2
+
+        elif cont == LeaderboardMenu:
+            self.screen.actualScreen = 3
+
+        elif cont == SummaryScreen:
+            self.screen.actualScreen = 4
+
+        else:
+            self.screen.actualScreen = 0
 
         frame = self.frames[cont]
         frame.configure(bg = "#2c3c43")
         frame.tkraise()
+
+    def refresh_label(self):
+        global minutes
+        global seconds
+        self.label.configure(fg = "#a7e02c")
+        self.label.configure(text="%.2i" % minutes+" : %.2i" % seconds)
         
+        if self.screen.actualScreen == 1:
+            self.seconds += 0.01
+            seconds += 0.01
+            if self.seconds >= 60.00:
+                self.seconds = self.seconds-60.0
+                seconds = self.seconds
+                self.minutes += 1
+                minutes += 1
+                
+
+        elif self.screen.actualScreen == 2:    
+            self.label.configure(text = "Settings")
+            
+
+        elif self.screen.actualScreen == 3:
+            self.label.configure(text = "Leaderboard")
+
+        elif self.screen.actualScreen == 4:
+            self.label.configure(fg = "#2c3c43")
+           
+
+        else:
+            self.label.configure(text = "Menu")
+           
+
+        self.label.after(10, self.refresh_label)
+
+    def ManageTopBtns(self):
+
+        if self.screen.actualScreen == 1:
+            self.leftBtn.configure(text = "Menu")
+
+        elif self.screen.actualScreen == 2:    
+            self.leftBtn.configure(text = "Settings")
+
+        elif self.screen.actualScreen == 3:
+            self.leftBtn.configure(text = "Leaderboard")
+
+        elif self.screen.actualScreen == 4:
+            self.leftBtn.configure(fg = "#2c3c43")
+           
+
+        else:
+            self.leftBtn.configure(text = "Menu")
+           
+
+        self.label.after(100, self.refresh_label)
+
+
 class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -68,7 +163,6 @@ class MainMenu(tk.Frame):
 
         tk.Label(self, bg = "#2c3c43", width = 25).grid(column = 2, row =0)
 
-        self.grid_rowconfigure(0, weight = 15)
         self.grid_rowconfigure(1, weight = 10)
         self.grid_rowconfigure(2, weight = 5)
         self.grid_rowconfigure(3, weight = 10)
@@ -79,9 +173,6 @@ class MainMenu(tk.Frame):
         self.grid_rowconfigure(8, weight = 15)
 
         #Koniec nastaveni okna Menu
-
-
-        tk.Label(self, text = "Menu", bg = "#2c3c43", fg = "#7aa719",font=("Times New Roman", 20, "bold")).grid(row = 0, column = 1)
 
         Continue = tk.Button(self, text="Continue", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#7aa719", state = "disabled",
                             command=lambda: controller.show_frame(GameScreen, False)).grid(row = 1, column = 1)
@@ -98,9 +189,9 @@ class MainMenu(tk.Frame):
 
 class GameScreen(tk.Frame):
 
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
 
         #Nastavenia okna Leaderboard
         self.grid_columnconfigure(0, weight = 10)
@@ -109,20 +200,28 @@ class GameScreen(tk.Frame):
 
         self.grid_columnconfigure(2, weight = 10)
 
-        leftBar = tk.Frame(self, width = 25)
+        leftBar = tk.Frame(self, width = 25,bg = "#2c3c43")
         leftBar.grid(column = 0, row =2)
 
-        for x in range(0,9):
-            tk.Button(leftBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
-             highlightthickness = 0, bd = 0, pady = 20, padx = 20,
-              command = lambda val = x+1: selectValue(val)).grid(column = 0, row = x)
+        
             
 
         self.grid_rowconfigure(0, weight = 5)
         self.grid_rowconfigure(1, weight = 15)
         self.grid_rowconfigure(2, weight = 70)
-        self.grid_rowconfigure(3, weight = 5)
+        self.grid_rowconfigure(3, weight = 10)
+
+        bottomBar = tk.Frame(self)
+        bottomBar.grid(row = 3, column = 1)
+
+        for x in range(0,9):
+            tk.Button(bottomBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
+             highlightthickness = 0, bd = 0, pady = 20, padx = 20,
+              command = lambda val = x+1: selectValue(val)).grid(column = x, row = 0)
+
         #Koniec nastaveni okna Leaderboard
+
+
 
         #Horna Navigacia
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
@@ -130,6 +229,8 @@ class GameScreen(tk.Frame):
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, True)).grid(row = 0, column = 2)
+
+       
  
         #Matica 9x9
         playMatrix = tk.Frame(self, bg = "#222e34")
@@ -137,8 +238,6 @@ class GameScreen(tk.Frame):
 
         sdkBtn =  [[0 for x in range(11)] for x in range(11)]
 
-        #Generovanie Matice 
-        fullBoard = mapGenerator.make_board(3)
 
         # Game grid
         for x in range(0,9):
@@ -172,55 +271,28 @@ class GameScreen(tk.Frame):
                      bg = bgcol, fg = "#7aa719", font = ('Helvetica 15 bold') ,command = lambda i=act_row, j=act_col : putValue(i, j, inputVal, controller),
                       highlightthickness = 0, bd = 0,)
                     sdkBtn[act_row][act_col].grid(row = rows, column = columns)
+                    
                 else:
                     if rows == 3 or rows == 7:
                         tkinter.ttk.Separator(playMatrix, orient=tk.HORIZONTAL).grid(column=columns, row=rows, columnspan=1, sticky='we')
                     else:
                         tkinter.ttk.Separator(playMatrix, orient=tk.VERTICAL).grid(column=columns, row=rows, rowspan=1, sticky='ns')
 
-        #Vyplnenie nahodnych cislic, tak aby boli na kazdom riadku vyplnene aspon 2 a celkovo 24 cislic v celej matici
+   
+            
+        sudoku = sc.Sudoku()
         for x in range(0,9):
-            toShowPosition = random.randint(0,8)
-            sdkBtn[x][toShowPosition]['text'] = fullBoard[x][toShowPosition]
-            sdkBtn[x][toShowPosition].configure(state = "disabled")
-            toShowAnotherPosition = random.randint(0,8)
-            while toShowAnotherPosition == toShowPosition:
-                toShowAnotherPosition = random.randint(0,8)
-            sdkBtn[x][toShowAnotherPosition]['text'] =  fullBoard[x][toShowAnotherPosition]
-            sdkBtn[x][toShowAnotherPosition].configure(state = "disabled")
-            
-
-        numsShown = 18
-        while numsShown < 25:
-            randX = random.randint(0,8)
-            randY = random.randint(0,8)
-
-            while sdkBtn[randX][randY]['text']:
-                randX = random.randint(0,8)
-                randY = random.randint(0,8)
-
-            sdkBtn[randX][randY]['text'] =  fullBoard[randX][randY]
-            sdkBtn[randX][randY].configure(state = "disabled")
-            numsShown += 1
-            
+            for y in range (0,9):
+                sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
 
         #controler pre zmenu vlastnosti na danej pozicii v poli
         def putValue( x, y, val, cont):
-            print("changing value ["+str(x)+"]["+str(y)+"]")
             sdkBtn[x][y].configure(text = str(val))
-
-            isMatrixCorrect = True
-
-            for rows in range(0,9):
-                for columns in range(0,9):
-                    if not sdkBtn[rows][columns]['text']:
-                        isMatrixCorrect = False
-                        break;
-
-                    if int(sdkBtn[rows][columns]['text']) != fullBoard[rows][columns]:
-                        isMatrixCorrect = False
-            print(str(isMatrixCorrect))
-            if isMatrixCorrect:
+            sudoku.gameBoard[x][y] = val
+        
+            if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
+                print(str(seconds) + "compare")
+                print(str(minutes) + "compare")
                 cont.show_frame(SummaryScreen, False)
         
 class SettingsMenu(tk.Frame):
@@ -240,8 +312,6 @@ class SettingsMenu(tk.Frame):
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
                            command=lambda: controller.show_frame(SummaryScreen, False)).grid(row = 0, column = 3)
-
-        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold"), pady = 15).grid( row = 0, column = 1)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
@@ -273,8 +343,6 @@ class backtoGameSettingsMenu(tk.Frame):
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
                            command=lambda: controller.show_frame(MainMenu, False)).grid(row = 0, column = 3)
 
-        tk.Label(self, text = "Settings", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 20, "bold"), pady = 15).grid( row = 0, column = 1)
-
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
                 takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
 
@@ -292,9 +360,12 @@ class SummaryScreen(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
-
+        global seconds
+        global minutes
+        print(str(minutes) + "summary")
+        print(str(seconds) + "summary")
         tk.Label(self, text = "You did it!", bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 50, "bold", "italic")).place(x = 250, y=250)
-        tk.Label(self, text = "Your time: {0}:{1}".format(random.randint(0,3), random.randint(0,59)), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
+        tk.Label(self, text = "Your time: {0:02d}:{1:02d}".format(minutes, seconds), bg = "#2c3c43", fg = "#7aa719",  font=("Times New Roman", 30, "bold")).place(x = 450, y=350)
 
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
@@ -323,9 +394,6 @@ class LeaderboardMenu(tk.Frame):
         self.grid_rowconfigure(2, weight = 75)
         self.grid_rowconfigure(3, weight = 5)
         #Koniec nastaveni okna Leaderboard
-
-
-        tk.Label(self, text = "Leaderboard", bg = "#2c3c43", fg = "#7aa719", font=("Times New Roman", 20, "bold")).grid(row = 1, column = 1)
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,
                             command=lambda: controller.show_frame(MainMenu, False))
@@ -383,4 +451,7 @@ class LeaderboardMenu(tk.Frame):
 app = MainWindow()
 app.minsize(900,700)
 app.title("Sudoku")
+app.configure(bg = "#2c3c43")
+for i in range(1,10):
+    app.bind(str(i), selectKeyboardValue)
 app.mainloop()

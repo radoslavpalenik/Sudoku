@@ -7,7 +7,7 @@ import random
 def make_board(m=3):
     """Return a random filled m**2 x m**2 Sudoku board."""
     n = m**2
-    board = [[None for _ in range(n)] for _ in range(n)]
+    board = [[0 for x in range(9)] for y in range(9)]
 
     def search(c=0):
         "Recursively search for a solution starting at position c."
@@ -29,3 +29,52 @@ def make_board(m=3):
             return None
 
     return search()
+
+
+def generateMask():
+    mask = [[0 for x in range(9)] for y in range(9)]
+    maskTemplate = [0,0,0,0,0,0,0,0,0]
+    for x in range(0,9):
+        random.shuffle(maskTemplate)
+        for y in range (0,9):  
+            mask[x][y] = maskTemplate[y]
+
+    return mask
+
+def generateGameBoard():
+    gameBoard = [[0 for x in range(9)] for y in range(9)]
+    global solvedBoard
+    solvedBoard = make_board(3)
+ 
+    
+    mask = generateMask()
+    for x in range(0,9):
+        for y in range (0,9):
+            if(mask[x][y] == 0):
+                gameBoard[x][y] = solvedBoard[x][y]
+            else:
+                gameBoard[x][y] = None
+
+    
+    
+    
+    return gameBoard
+
+def checkIfSolved(gameBoard):
+    solved = False
+    for x in range(0,9):
+        for y in range (0,9):
+            if(gameBoard == solvedBoard):
+                solved = True
+            else:
+                solved = False
+    return solved
+
+
+    
+
+
+
+            
+
+
