@@ -4,6 +4,9 @@ import random
 import mapGenerator
 import boxClass
 import sudokuClass as sc
+import copy
+import itertools
+from collisionDetector import collisionDetector as cd
 
 
 #   ITU, 2019, 2BIT
@@ -14,21 +17,30 @@ import sudokuClass as sc
 inputVal = 1
 seconds = 0
 minutes = 0
-sudoku = sc.Sudoku(0)
+sudoku = sc.Sudoku()
 sdkBtn =  [[0 for x in range(11)] for x in range(11)]
+lastEdited = 0
+gBtn = [tk.Button]
 beforeFirstGame = 1
+numLeft = [None]*9 
+showNumbersLeft = 0
 
 
-def selectValue(val):
+def selectValue(val, self):
     global inputVal
-    print(str(val+100))
+    global gBtn
     inputVal = val
-
+    
 def selectKeyboardValue(val):
+    global gBtn
     global inputVal
-    print(val.char)
+    for i in range (1,10):
+        gBtn[i].configure(bg = "#2c3c43", fg = "#a7e02c" )
     val = val.char
-    selectValue(int(val))
+    inputVal = int(val)
+    gBtn[int(val)]['bg'] = "#a7e02c"
+    gBtn[int(val)]['fg'] = "#2c3c43"
+    
 
 class TopScreenStruct:
     def __init__(self):
@@ -48,7 +60,7 @@ class MainWindow(tk.Tk):
         self.seconds = 0
         self.minutes = 0
         # label displaying time
-        self.label = tk.Label(self, text="0 s", font="Arial 30", width=80 , bg ="#2c3c43", foreground = "#a7e02c")
+        self.label = tk.Label(self, text="0 s", font="Arial 30", width=20 , bg ="#2c3c43", foreground = "#a7e02c")
         self.label.pack()
         # start the timer
         self.label.after(10, self.refresh_label)
@@ -83,23 +95,33 @@ class MainWindow(tk.Tk):
             cont = backtoGameSettingsMenu
 
         if isNewGame:
-        	seconds = 0
-        	minutes = 0
-        	beforeFirstGame = 0
+            seconds = 0
+            minutes = 0
+            beforeFirstGame = 0
 
 
-        	for x in range(0,9):
-	            for y in range (0,9):
-	                sdkBtn[x][y].configure(text = "")
+            for x in range(0,9):
+                for y in range (0,9):
+                    sdkBtn[x][y].configure(text = "")
+                    
 
-        	if Level > 0:
-        		sudoku.reset(Level)
+            if Level > 0:
+                sudoku.reset(Level)
+                if showNumbersLeft == 1:
+                    for num in range(0,9):
+                        numLeft[num]["text"] = sudoku.checkMissing(num+1)
 
 
 
-	        for x in range(0,9):
-	            for y in range (0,9):
-	                sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
+            for x in range(0,9):
+                for y in range (0,9):
+
+                    sdkBtn[x][y].configure(text = sudoku.gameBoard[x][y])
+                    if(sudoku.gameBoard[x][y] != None):
+                        sdkBtn[x][y].configure(state = "disabled")
+                    else:
+                        sdkBtn[x][y].configure(state = "normal")
+
 
         if cont == GameScreen:
             self.screen.actualScreen = 1
@@ -181,8 +203,6 @@ class MainWindow(tk.Tk):
         self.label.after(100, self.refresh_label)
 
 
-
-
 class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -218,7 +238,7 @@ class MainMenu(tk.Frame):
         self.Continue.after(10, self.checkIfContinue)
 
         newGame = tk.Button(self, text="New Game", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(levelSelect, False, True,0)).grid(row = 3, column = 1)
+                            command=lambda: controller.show_frame(levelSelect, False, False,0)).grid(row = 3, column = 1)
 
         Settings = tk.Button(self, text="Settings", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(SettingsMenu, False, False,0)).grid(row = 5, column = 1)
@@ -236,9 +256,13 @@ class MainMenu(tk.Frame):
 
         	self.Continue.after(100, self.checkIfContinue)
 
+
 class GameScreen(tk.Frame):
 
+    
 
+    
+        
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
@@ -253,31 +277,55 @@ class GameScreen(tk.Frame):
         leftBar.grid(column = 0, row =2)
 
         
-            
+        
 
-        self.grid_rowconfigure(0, weight = 5)
-        self.grid_rowconfigure(1, weight = 15)
+        self.grid_rowconfigure(1, weight = 5)
+        self.grid_rowconfigure(0, weight = 15)
         self.grid_rowconfigure(2, weight = 70)
-        self.grid_rowconfigure(3, weight = 10)
+        self.grid_rowconfigure(3, weight = 5)
+        self.grid_rowconfigure(4, weight = 5)
 
         bottomBar = tk.Frame(self)
         bottomBar.grid(row = 3, column = 1)
+    
+        #btn = [tk.Button]*10
+        global gBtn
+        btn = [tk.Button]*10
+        for i in range(1,10):
+            btn[i] = tk.Button(bottomBar, text = i, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
+                highlightthickness = 0, bd = 0, pady = 20, padx = 20)
+            gBtn.append(btn[i])
+            btn[i].grid(column = i, row = 0)
 
-        for x in range(0,9):
-            tk.Button(bottomBar, text = x+1, fg = "#a7e02c",bg = "#2c3c43", font = ("Helvetica 18 bold"),
-             highlightthickness = 0, bd = 0, pady = 20, padx = 20,
-              command = lambda val = x+1: selectValue(val)).grid(column = x, row = 0)
+        btn[1].configure(command = lambda: resetColor(btn[1], 1))
+        btn[2].configure(command = lambda: resetColor(btn[2], 2))
+        btn[3].configure(command = lambda: resetColor(btn[3], 3))
+        btn[4].configure(command = lambda: resetColor(btn[4], 4))
+        btn[5].configure(command = lambda: resetColor(btn[5], 5))
+        btn[6].configure(command = lambda: resetColor(btn[6], 6))
+        btn[7].configure(command = lambda: resetColor(btn[7], 7))
+        btn[8].configure(command = lambda: resetColor(btn[8], 8))
+        btn[9].configure(command = lambda: resetColor(btn[9], 9))
+        
 
+        def changeBg(self, val):
+            self.configure(bg = "#a7e02c" , fg = "#2c3c43" )
+            selectValue(val, self)
+
+        def resetColor(self, val):
+            for i in range(1,10):
+                btn[i].configure(bg = "#2c3c43", fg = "#a7e02c" )
+            changeBg(self, val)
         #Koniec nastaveni okna Leaderboard
 
 
 
         #Horna Navigacia
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 0)
+                            command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 0, padx = 20)
 
         jumpToSettings = tk.Button(self, text="Settings",highlightthickness = 0,  height = 1,bg = "#a7e02c",
-                            command=lambda: controller.show_frame(SettingsMenu, True, False,0)).grid(row = 0, column = 2)
+                            command=lambda: controller.show_frame(SettingsMenu, True, False,0)).grid(row = 0, column = 2, padx = 20)
 
        
  
@@ -312,7 +360,7 @@ class GameScreen(tk.Frame):
 
                     #Prepinanie farieb pre lepsiu prehladnost aplikacie
                     if ((columns <= 2 or columns >= 7) and (rows <= 2 or rows >=7)) or ((columns > 2 and columns < 7 ) and (rows > 3 and rows < 8)) :
-                        bgcol = "#4a6571"
+                        bgcol = "#1e292f"
 
 
                     sdkBtn[act_row][act_col] = tk.Button(playMatrix,width = 5, height = 3,
@@ -328,15 +376,36 @@ class GameScreen(tk.Frame):
 
    
         global sudoku
-       
+        
+        helpFrame = tk.Frame(self)
+        helpFrame.grid(row = 4, column = 1)
+        global numLeft
+
+        for x in range(0,9):
+        	numLeft[x] = tk.Label(helpFrame,text = "", bg = "#2c3c43", fg = "#7aa719", font = ("Helvetica 18 bold"),highlightthickness = 0,padx = 20)
+        	numLeft[x].grid( row = 0, column = x)
 
         #controler pre zmenu vlastnosti na danej pozicii v poli
         def putValue( x, y, val, cont):
             sdkBtn[x][y].configure(text = str(val))
             sudoku.gameBoard[x][y] = val
-        
+
             if(mapGenerator.checkIfSolved(sudoku.gameBoard)):
                 cont.show_frame(SummaryScreen, False, False,0)
+
+            if enableCollisionCheck.get() == 1:
+                cd.markCollision(x, y, sudoku.gameBoard, sdkBtn)
+
+            if showNumbersLeft == 1:
+                for number in range(0,9):
+                    numslft = sudoku.checkMissing(number+1)
+                    numLeft[number]["text"] = numslft
+                    if numslft < 0:
+                        numLeft[number]["fg"] = "red"
+                    else:
+                         numLeft[number]["fg"] = "#7aa719"
+        
+            
         
 class SettingsMenu(tk.Frame):
 
@@ -354,10 +423,14 @@ class SettingsMenu(tk.Frame):
                            command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 0)
         #Moj Super CHEAT
         tk.Button(self, text="",highlightthickness = 0, width = 10, height = 1, bg = "#2c3c43", bd = 0,
-                           command=lambda: controller.show_frame(SummaryScreen, False, False,0)).grid(row = 0, column = 3)
+                           command=lambda: controller.show_frame(SummaryScreen, False, False, 0)).grid(row = 0, column = 3)
+
+        global enableCollisionCheck
+        enableCollisionCheck = tk.IntVar()
+       
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
-                takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
+                takefocus = 0, variable =  showNumbersLeft,onvalue = 1, offvalue = 0,command = self.switchShowNumbers ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
 
         tk.Checkbutton(self, text ='Show button to validate progress of game', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
                 takefocus = 0, ).grid(row = 2, column = 1,pady = 15,  sticky ="we")
@@ -368,6 +441,20 @@ class SettingsMenu(tk.Frame):
         tk.Checkbutton(self, text ='Enable adding notes in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
                 takefocus = 0, ).grid(row = 4, column = 1,pady = 15,  sticky ="we")
 
+        tk.Checkbutton(self, text ='Enable automatic collision checking', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
+                takefocus = 0, variable = enableCollisionCheck).grid(row = 5, column = 1,pady = 15,  sticky ="we")
+
+    def switchShowNumbers(self):
+        global showNumbersLeft
+        if showNumbersLeft == 1:
+            showNumbersLeft = 0
+            
+            for number in range(0,9):
+                numLeft[number]["text"] = ""
+        else:
+            showNumbersLeft = 1
+            for num in range(0,9):
+                numLeft[num]["text"] = sudoku.checkMissing(num+1)
 
 class backtoGameSettingsMenu(tk.Frame):
 
@@ -387,7 +474,7 @@ class backtoGameSettingsMenu(tk.Frame):
                            command=lambda: controller.show_frame(MainMenu, False, False,0)).grid(row = 0, column = 3)
 
         tk.Checkbutton(self, text ='Show count from each number left in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3,  font= ("Times New Roman", 15,"bold"),
-                takefocus = 0, ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
+                takefocus = 0, variable =  showNumbersLeft,onvalue = 1, offvalue = 0,command = self.switchShowNumbers ).grid(row = 1, column = 1,pady = 15,  sticky ="we")
 
         tk.Checkbutton(self, text ='Show button to validate progress of game', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
                 takefocus = 0, ).grid(row = 2, column = 1,pady = 15,  sticky ="we")
@@ -397,6 +484,18 @@ class backtoGameSettingsMenu(tk.Frame):
 
         tk.Checkbutton(self, text ='Enable adding notes in matrix', bg = "#a7e02c", bd = 0, highlightthickness = 0,  height = 3, font= ("Times New Roman", 15,"bold"), 
                 takefocus = 0, ).grid(row = 4, column = 1,pady = 15,  sticky ="we")
+
+    def switchShowNumbers(self):
+        global showNumbersLeft
+        if (showNumbersLeft == 1):
+
+                showNumbersLeft = 0
+                for number in range(0,9):
+                    numLeft[number]["text"] = ""
+        else:
+                showNumbersLeft = 1
+                for num in range(0,9):
+                    numLeft[num]["text"] = sudoku.checkMissing(num+1)
 
 class SummaryScreen(tk.Frame):
 
@@ -415,10 +514,10 @@ class SummaryScreen(tk.Frame):
 
         backToMenu = tk.Button(self, text="Back to Menu",highlightthickness = 0, width = 10, height = 1,bg = "#a7e02c",
                             command=lambda: controller.show_frame(MainMenu, False, False,0)).place(x=50,y=50)
-        
-        global beforeFirstGame
-        beforeFirstGame = 1
 
+    global beforeFirstGame
+    beforeFirstGame = 1
+    
     def chcekTime(self):
 	        global minutes
 	        global seconds
@@ -503,10 +602,13 @@ class LeaderboardMenu(tk.Frame):
 
             nth_row+=1
 
+
 class levelSelect(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
+        
 
        	self.grid_columnconfigure(0, weight = 1)
 
@@ -541,9 +643,6 @@ class levelSelect(tk.Frame):
         tk.Button(self, text="Hard", font = ("Times New Roman", 12, "bold", "italic"),highlightthickness = 0,bd =0,  width = 75, height = 3,bg = "#a7e02c",
                             command=lambda: controller.show_frame(GameScreen, False, True,3)).grid(row = 5, column = 1)
 
-
-
-   
 app = MainWindow()
 app.minsize(800,600)
 app.title("Sudoku")
